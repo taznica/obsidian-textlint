@@ -1,13 +1,17 @@
 import {
 	App,
 	Editor,
+	FileSystemAdapter,
 	MarkdownView,
 	Modal,
 	Notice,
 	Plugin,
 	PluginSettingTab,
 	Setting,
+	TFile,
 } from "obsidian";
+import * as path from "path";
+import { TextLintEngine as devTextLintEngine } from "textlint";
 
 // Remember to rename these classes and interfaces!
 
@@ -22,8 +26,49 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
 
+	textLintEngine: typeof devTextLintEngine;
+
+	getVaultAbsolutePath = (app: App) => {
+		// TODO: app.vault.adapter.getBasePath() -> app.vault.getResourcePath()
+		return app.vault.adapter instanceof FileSystemAdapter
+			? app.vault.adapter.getBasePath()
+			: null;
+	};
+
+	getNodeModulesAbsolutePath = (app: App) => {
+		const vaultPath = this.getVaultAbsolutePath(app);
+		const configDir = app.vault.configDir;
+		const nodeModulesDir = "node_modules";
+
+		return typeof vaultPath === "string"
+			? path.resolve(vaultPath, configDir, nodeModulesDir)
+			: null;
+	};
+
+	getTextlintrcAbsolutePath = (app: App) => {
+		const vaultPath = this.getVaultAbsolutePath(app);
+		const configDir = app.vault.configDir;
+		const textlintrcFile = ".textlintrc";
+
+		return typeof vaultPath === "string"
+			? path.resolve(vaultPath, configDir, textlintrcFile)
+			: null;
+	};
+
 	async onload() {
 		await this.loadSettings();
+
+		const app = this.app;
+		const nodeModulesPath = this.getNodeModulesAbsolutePath(app);
+		const textlintrcPath = this.getTextlintrcAbsolutePath(app);
+
+		if (nodeModulesPath !== null) {
+			// eslint-disable-next-line @typescript-eslint/no-var-requires
+			this.textLintEngine = require(path.resolve(
+				nodeModulesPath,
+				"textlint"
+			)).TextLintEngine;
+		}
 
 		// This creates an icon in the left ribbon.
 		const ribbonIconEl = this.addRibbonIcon(
@@ -31,7 +76,29 @@ export default class MyPlugin extends Plugin {
 			"Sample Plugin",
 			(evt: MouseEvent) => {
 				// Called when the user clicks the icon.
-				new Notice("This is a notice!");
+				const activeFile = this.app.workspace.getActiveFile();
+				const vaultPath = this.getVaultAbsolutePath(app);
+				if (
+					activeFile instanceof TFile &&
+					typeof nodeModulesPath === "string" &&
+					typeof textlintrcPath === "string" &&
+					typeof vaultPath === "string"
+				) {
+					const filePath = path.join(vaultPath, activeFile.path);
+					this.lintFile(
+						textlintrcPath,
+						nodeModulesPath,
+						filePath
+					).then((result) => {
+						console.log(result);
+						new Notice(result);
+					});
+				}
+
+				if (!(activeFile instanceof TFile)) {
+					console.log("no activeFile");
+					new Notice("no activeFile");
+				}
 			}
 		);
 		// Perform additional things with the ribbon
@@ -106,6 +173,33 @@ export default class MyPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+	}
+
+	lintFile(
+		textlintrcPath: string,
+		nodeModulesPath: string,
+		filePath: string
+	) {
+		const options = {
+			configFile: textlintrcPath,
+			rulesBaseDirectory: nodeModulesPath,
+		};
+
+		const engine = new this.textLintEngine(options);
+		const filePathList = [filePath];
+
+		return engine.executeOnFiles(filePathList).then(
+			// @ts-ignore
+			(results) => {
+				let output = "";
+				if (engine.isErrorResults(results)) {
+					output = engine.formatResults(results);
+				} else {
+					output = "All Passed!";
+				}
+				return output;
+			}
+		);
 	}
 }
 
