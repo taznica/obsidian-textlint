@@ -12,6 +12,8 @@ import {
 } from "obsidian";
 import * as path from "path";
 import { TextLintEngine as devTextLintEngine } from "textlint";
+import { ResultsView, VIEW_TYPE_RESULTS } from "./results-view";
+import { TextlintResult } from "@textlint/types";
 
 // Remember to rename these classes and interfaces!
 
@@ -25,7 +27,7 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
-
+	resultsView: ResultsView;
 	textLintEngine: typeof devTextLintEngine;
 
 	getVaultAbsolutePath = (app: App) => {
@@ -89,9 +91,16 @@ export default class MyPlugin extends Plugin {
 						textlintrcPath,
 						nodeModulesPath,
 						filePath
-					).then((result) => {
-						console.log(result);
-						new Notice(result);
+					).then((results: TextlintResult[]) => {
+						this.activateResultsView().then(() => {
+							this.app.workspace
+								.getLeavesOfType(VIEW_TYPE_RESULTS)
+								.forEach((leaf) => {
+									if (leaf.view instanceof ResultsView) {
+										this.resultsView.updateView(results);
+									}
+								});
+						});
 					});
 				}
 
@@ -149,6 +158,11 @@ export default class MyPlugin extends Plugin {
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new SampleSettingTab(this.app, this));
 
+		this.registerView(
+			VIEW_TYPE_RESULTS,
+			(leaf) => (this.resultsView = new ResultsView(leaf))
+		);
+
 		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
 		// Using this function will automatically remove the event listener when this plugin is disabled.
 		this.registerDomEvent(document, "click", (evt: MouseEvent) => {
@@ -161,7 +175,9 @@ export default class MyPlugin extends Plugin {
 		);
 	}
 
-	onunload() {}
+	onunload() {
+		this.app.workspace.detachLeavesOfType(VIEW_TYPE_RESULTS);
+	}
 
 	async loadSettings() {
 		this.settings = Object.assign(
@@ -173,6 +189,19 @@ export default class MyPlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+	}
+
+	async activateResultsView() {
+		this.app.workspace.detachLeavesOfType(VIEW_TYPE_RESULTS);
+
+		await this.app.workspace.getRightLeaf(false).setViewState({
+			type: VIEW_TYPE_RESULTS,
+			active: true,
+		});
+
+		this.app.workspace.revealLeaf(
+			this.app.workspace.getLeavesOfType(VIEW_TYPE_RESULTS)[0]
+		);
 	}
 
 	lintFile(
@@ -188,18 +217,12 @@ export default class MyPlugin extends Plugin {
 		const engine = new this.textLintEngine(options);
 		const filePathList = [filePath];
 
-		return engine.executeOnFiles(filePathList).then(
-			// @ts-ignore
-			(results) => {
-				let output = "";
-				if (engine.isErrorResults(results)) {
-					output = engine.formatResults(results);
-				} else {
-					output = "All Passed!";
-				}
-				return output;
-			}
-		);
+		return engine
+			.executeOnFiles(filePathList)
+			.then((results: TextlintResult[]) => {
+				console.log(`results: ${engine.formatResults(results)}`);
+				return results;
+			});
 	}
 }
 
