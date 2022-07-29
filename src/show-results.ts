@@ -19,7 +19,11 @@ export function showResults(
 	results.forEach(function (result) {
 		const messages = result.messages;
 
-		if (messages.length === 0) {
+		if (messages.length === 0 && outputType === "detail") {
+			node.createDiv({ cls: "detail" }).createSpan({
+				cls: "detail-pass",
+				text: "All passed.",
+			});
 			return;
 		}
 
@@ -65,11 +69,15 @@ export function showResults(
 
 	if (outputType === "summary") {
 		const summary = node.createDiv({ cls: "summary" });
-		summary.createSpan(
-			`${total} ${pluralize("problem", total)} (${errors} ${pluralize(
+		summary.createSpan({
+			cls: "summary-content",
+			text: `${total} ${pluralize(
+				"problem",
+				total
+			)} (${errors} ${pluralize(
 				"error",
 				errors
-			)}, ${warnings} ${pluralize("warning", warnings)})`
-		);
+			)}, ${warnings} ${pluralize("warning", warnings)})`,
+		});
 	}
 }

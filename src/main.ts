@@ -14,6 +14,7 @@ import * as path from "path";
 import { TextLintEngine as devTextLintEngine } from "textlint";
 import { ResultsView, VIEW_TYPE_RESULTS } from "./results-view";
 import { TextlintResult } from "@textlint/types";
+import { showResults } from "./show-results";
 
 // Remember to rename these classes and interfaces!
 
@@ -72,6 +73,9 @@ export default class MyPlugin extends Plugin {
 			)).TextLintEngine;
 		}
 
+		const resultsBarItem = this.addStatusBarItem();
+		this.updateResultsBarItem(resultsBarItem, []);
+
 		// This creates an icon in the left ribbon.
 		const ribbonIconEl = this.addRibbonIcon(
 			"dice",
@@ -93,6 +97,7 @@ export default class MyPlugin extends Plugin {
 						filePath
 					).then((results: TextlintResult[]) => {
 						this.updateResultsView(results);
+						this.updateResultsBarItem(resultsBarItem, results);
 					});
 				}
 
@@ -104,10 +109,6 @@ export default class MyPlugin extends Plugin {
 		);
 		// Perform additional things with the ribbon
 		ribbonIconEl.addClass("my-plugin-ribbon-class");
-
-		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
-		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText("Status Bar Text");
 
 		// This adds a simple command that can be triggered anywhere
 		this.addCommand({
@@ -227,6 +228,14 @@ export default class MyPlugin extends Plugin {
 					}
 				});
 		});
+	}
+
+	updateResultsBarItem(
+		resultsBarItem: HTMLElement,
+		results: TextlintResult[]
+	): void {
+		resultsBarItem.empty();
+		showResults("summary", results, resultsBarItem);
 	}
 }
 
