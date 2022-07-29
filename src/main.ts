@@ -92,15 +92,7 @@ export default class MyPlugin extends Plugin {
 						nodeModulesPath,
 						filePath
 					).then((results: TextlintResult[]) => {
-						this.activateResultsView().then(() => {
-							this.app.workspace
-								.getLeavesOfType(VIEW_TYPE_RESULTS)
-								.forEach((leaf) => {
-									if (leaf.view instanceof ResultsView) {
-										this.resultsView.updateView(results);
-									}
-								});
-						});
+						this.updateResultsView(results);
 					});
 				}
 
@@ -223,6 +215,18 @@ export default class MyPlugin extends Plugin {
 				console.log(`results: ${engine.formatResults(results)}`);
 				return results;
 			});
+	}
+
+	updateResultsView(results: TextlintResult[]): void {
+		this.activateResultsView().then(() => {
+			this.app.workspace
+				.getLeavesOfType(VIEW_TYPE_RESULTS)
+				.forEach((leaf) => {
+					if (leaf.view instanceof ResultsView) {
+						this.resultsView.updateView(results);
+					}
+				});
+		});
 	}
 }
 
