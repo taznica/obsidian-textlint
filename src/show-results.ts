@@ -44,19 +44,19 @@ export function showResults(
 			if (outputType === "detail") {
 				const detail = node.createDiv({ cls: "detail" });
 				detail.createSpan({
-					cls: "loc",
+					cls: "detail-loc",
 					text: `[${message.loc.start.line.toString()}:${message.loc.start.column.toString()}] `,
 				});
 				detail.createSpan({
-					cls: "severity",
+					cls: "detail-severity",
 					text: `${severityLabel.toString()} `,
 				});
 				detail.createSpan({
-					cls: "message",
+					cls: "detail-message",
 					text: `${message.message} `,
 				});
 				detail.createSpan({
-					cls: "ruleId",
+					cls: "detail-ruleId",
 					text: `${message.ruleId} \n`,
 				});
 			}
