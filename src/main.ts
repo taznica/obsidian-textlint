@@ -5,7 +5,7 @@ import { ResultsView, VIEW_TYPE_RESULTS } from "./results-view";
 import { TextlintResult } from "@textlint/types";
 import { showResults } from "./show-results";
 
-export default class MyPlugin extends Plugin {
+export default class TextlintPlugin extends Plugin {
 	resultsView: ResultsView;
 	textLintEngine: typeof devTextLintEngine;
 
