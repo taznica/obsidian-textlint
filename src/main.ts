@@ -9,33 +9,6 @@ export default class TextlintPlugin extends Plugin {
 	resultsView: ResultsView;
 	textLintEngine: typeof devTextLintEngine;
 
-	getVaultAbsolutePath = (app: App) => {
-		// TODO: app.vault.adapter.getBasePath() -> app.vault.getResourcePath()
-		return app.vault.adapter instanceof FileSystemAdapter
-			? app.vault.adapter.getBasePath()
-			: null;
-	};
-
-	getNodeModulesAbsolutePath = (app: App) => {
-		const vaultPath = this.getVaultAbsolutePath(app);
-		const configDir = app.vault.configDir;
-		const nodeModulesDir = "node_modules";
-
-		return typeof vaultPath === "string"
-			? path.resolve(vaultPath, configDir, nodeModulesDir)
-			: null;
-	};
-
-	getTextlintrcAbsolutePath = (app: App) => {
-		const vaultPath = this.getVaultAbsolutePath(app);
-		const configDir = app.vault.configDir;
-		const textlintrcFile = ".textlintrc";
-
-		return typeof vaultPath === "string"
-			? path.resolve(vaultPath, configDir, textlintrcFile)
-			: null;
-	};
-
 	async onload() {
 		const app = this.app;
 		const nodeModulesPath = this.getNodeModulesAbsolutePath(app);
@@ -85,6 +58,33 @@ export default class TextlintPlugin extends Plugin {
 	onunload() {
 		this.app.workspace.detachLeavesOfType(VIEW_TYPE_RESULTS);
 	}
+
+	getVaultAbsolutePath = (app: App) => {
+		// TODO: app.vault.adapter.getBasePath() -> app.vault.getResourcePath()
+		return app.vault.adapter instanceof FileSystemAdapter
+			? app.vault.adapter.getBasePath()
+			: null;
+	};
+
+	getNodeModulesAbsolutePath = (app: App) => {
+		const vaultPath = this.getVaultAbsolutePath(app);
+		const configDir = app.vault.configDir;
+		const nodeModulesDir = "node_modules";
+
+		return typeof vaultPath === "string"
+			? path.resolve(vaultPath, configDir, nodeModulesDir)
+			: null;
+	};
+
+	getTextlintrcAbsolutePath = (app: App) => {
+		const vaultPath = this.getVaultAbsolutePath(app);
+		const configDir = app.vault.configDir;
+		const textlintrcFile = ".textlintrc";
+
+		return typeof vaultPath === "string"
+			? path.resolve(vaultPath, configDir, textlintrcFile)
+			: null;
+	};
 
 	lintFile(
 		textlintrcPath: string,
