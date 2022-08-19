@@ -3,7 +3,7 @@ import * as path from "path";
 import { TextLintEngine as devTextLintEngine } from "textlint";
 import { ResultsView, VIEW_TYPE_RESULTS } from "./results-view";
 import { TextlintResult } from "@textlint/types";
-import { showResults } from "./show-results";
+import { formatAsSummary } from "./format";
 
 export default class TextlintPlugin extends Plugin {
 	resultsView: ResultsView;
@@ -137,6 +137,6 @@ export default class TextlintPlugin extends Plugin {
 		results: TextlintResult[]
 	): void {
 		resultsBarItem.empty();
-		showResults("summary", results, resultsBarItem);
+		resultsBarItem.appendChild(formatAsSummary(results));
 	}
 }

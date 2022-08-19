@@ -1,6 +1,6 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
 import { TextlintResult } from "@textlint/types";
-import { showResults } from "./show-results";
+import { formatAsDetail } from "./format";
 
 export const VIEW_TYPE_RESULTS = "results-view";
 
@@ -27,6 +27,6 @@ export class ResultsView extends ItemView {
 	async updateView(results: TextlintResult[]) {
 		const container = this.containerEl.children[1];
 		container.empty();
-		showResults("detail", results, container);
+		container.appendChild(formatAsDetail(results));
 	}
 }
