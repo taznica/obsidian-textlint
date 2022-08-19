@@ -11,7 +11,7 @@ export function showResults(
 	outputType: outputType,
 	results: TextlintResult[],
 	node: Element
-) {
+): void {
 	let total = 0;
 	let errors = 0;
 	let warnings = 0;
