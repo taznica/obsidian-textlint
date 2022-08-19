@@ -91,10 +91,13 @@ export const formatAsSummary: (results: TextlintResult[]) => HTMLDivElement = (
 
 	container.createSpan({
 		cls: "summary",
-		text: `${total} ${pluralize("problem", total)} (${errors} ${pluralize(
-			"error",
-			errors
-		)}, ${warnings} ${pluralize("warning", warnings)})`,
+		text: `textlint: ${total} ${pluralize(
+			"problem",
+			total
+		)} (${errors} ${pluralize("error", errors)}, ${warnings} ${pluralize(
+			"warning",
+			warnings
+		)})`,
 	});
 
 	return container;
