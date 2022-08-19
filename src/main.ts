@@ -9,7 +9,7 @@ export default class TextlintPlugin extends Plugin {
 	resultsView: ResultsView;
 	textLintEngine: typeof devTextLintEngine;
 
-	async onload() {
+	onload = async () => {
 		const app = this.app;
 		const nodeModulesPath = this.getNodeModulesAbsolutePath(app);
 		const textlintrcPath = this.getTextlintrcAbsolutePath(app);
@@ -53,20 +53,20 @@ export default class TextlintPlugin extends Plugin {
 			VIEW_TYPE_RESULTS,
 			(leaf) => (this.resultsView = new ResultsView(leaf))
 		);
-	}
+	};
 
-	onunload() {
+	onunload = (): void => {
 		this.app.workspace.detachLeavesOfType(VIEW_TYPE_RESULTS);
-	}
+	};
 
-	getVaultAbsolutePath = (app: App) => {
+	getVaultAbsolutePath = (app: App): string | null => {
 		// TODO: app.vault.adapter.getBasePath() -> app.vault.getResourcePath()
 		return app.vault.adapter instanceof FileSystemAdapter
 			? app.vault.adapter.getBasePath()
 			: null;
 	};
 
-	getNodeModulesAbsolutePath = (app: App) => {
+	getNodeModulesAbsolutePath = (app: App): string | null => {
 		const vaultPath = this.getVaultAbsolutePath(app);
 		const configDir = app.vault.configDir;
 		const nodeModulesDir = "node_modules";
@@ -76,7 +76,7 @@ export default class TextlintPlugin extends Plugin {
 			: null;
 	};
 
-	getTextlintrcAbsolutePath = (app: App) => {
+	getTextlintrcAbsolutePath = (app: App): string | null => {
 		const vaultPath = this.getVaultAbsolutePath(app);
 		const configDir = app.vault.configDir;
 		const textlintrcFile = ".textlintrc";
@@ -86,11 +86,11 @@ export default class TextlintPlugin extends Plugin {
 			: null;
 	};
 
-	lintFile(
+	lintFile = (
 		textlintrcPath: string,
 		nodeModulesPath: string,
 		filePath: string
-	) {
+	): Promise<TextlintResult[]> => {
 		const options = {
 			configFile: textlintrcPath,
 			rulesBaseDirectory: nodeModulesPath,
@@ -105,9 +105,9 @@ export default class TextlintPlugin extends Plugin {
 				console.log(`results: ${engine.formatResults(results)}`);
 				return results;
 			});
-	}
+	};
 
-	async activateResultsView() {
+	activateResultsView = async (): Promise<void> => {
 		this.app.workspace.detachLeavesOfType(VIEW_TYPE_RESULTS);
 
 		await this.app.workspace.getRightLeaf(false).setViewState({
@@ -118,9 +118,9 @@ export default class TextlintPlugin extends Plugin {
 		this.app.workspace.revealLeaf(
 			this.app.workspace.getLeavesOfType(VIEW_TYPE_RESULTS)[0]
 		);
-	}
+	};
 
-	updateResultsView(results: TextlintResult[]): void {
+	updateResultsView = (results: TextlintResult[]): void => {
 		this.activateResultsView().then(() => {
 			this.app.workspace
 				.getLeavesOfType(VIEW_TYPE_RESULTS)
@@ -130,13 +130,13 @@ export default class TextlintPlugin extends Plugin {
 					}
 				});
 		});
-	}
+	};
 
-	updateResultsBarItem(
+	updateResultsBarItem = (
 		resultsBarItem: HTMLElement,
 		results: TextlintResult[]
-	): void {
+	): void => {
 		resultsBarItem.empty();
 		resultsBarItem.appendChild(formatAsSummary(results));
-	}
+	};
 }
