@@ -9,22 +9,22 @@ export class ResultsView extends ItemView {
 		super(leaf);
 	}
 
-	getViewType(): string {
+	getViewType = (): string => {
 		return VIEW_TYPE_RESULTS;
-	}
+	};
 
-	getDisplayText(): string {
+	getDisplayText = (): string => {
 		return "TextLint results view";
-	}
+	};
 
-	async onOpen() {
+	onOpen = async (): Promise<void> => {
 		const container = this.containerEl.children[1];
 		container.empty();
-	}
+	};
 
-	async onClose() {}
+	onClose = async (): Promise<void> => {};
 
-	async updateView(results: TextlintResult[]) {
+	updateView = async (results: TextlintResult[]): Promise<void> => {
 		const container = this.containerEl.children[1];
 		container.empty();
 		container.appendChild(formatAsDetail(results));
@@ -40,5 +40,5 @@ export class ResultsView extends ItemView {
 				target.toggleClass("result-selected", true);
 			});
 		});
-	}
+	};
 }

@@ -9,7 +9,7 @@ export default class TextlintPlugin extends Plugin {
 	resultsView: ResultsView;
 	textLintEngine: typeof devTextLintEngine;
 
-	onload = async () => {
+	onload = async (): Promise<void> => {
 		const app = this.app;
 		const nodeModulesPath = this.getNodeModulesAbsolutePath(app);
 		const textlintrcPath = this.getTextlintrcAbsolutePath(app);

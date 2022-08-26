@@ -5,9 +5,7 @@ const pluralize = (word: string, count: number): string => {
 	return count === 1 ? word : word + "s";
 };
 
-export const formatAsDetail: (results: TextlintResult[]) => HTMLDivElement = (
-	results: TextlintResult[]
-) => {
+export const formatAsDetail = (results: TextlintResult[]): HTMLDivElement => {
 	const resultsContainer = createDiv({ cls: "textlint-results-container" });
 
 	results.forEach((result: TextlintResult) => {
@@ -69,9 +67,7 @@ export const formatAsDetail: (results: TextlintResult[]) => HTMLDivElement = (
 	return resultsContainer;
 };
 
-export const formatAsSummary: (results: TextlintResult[]) => HTMLDivElement = (
-	results: TextlintResult[]
-) => {
+export const formatAsSummary = (results: TextlintResult[]): HTMLDivElement => {
 	let total = 0;
 	let errors = 0;
 	let warnings = 0;
