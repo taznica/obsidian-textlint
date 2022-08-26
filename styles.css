@@ -1,0 +1,42 @@
+.textlint-results-container .result {
+	border: 1px solid transparent;
+	border-radius: 3px;
+	font-size: 14px;
+	line-height: 20px;
+	padding: 1px 10px 0 18px;
+	min-width: 100%;
+}
+
+.textlint-results-container .result .result-primary {
+	color: var(--text-normal);
+}
+
+.textlint-results-container .result .result-secondary {
+	color: var(--text-muted);
+}
+
+.textlint-results-container .result-selected {
+	border: 1px solid transparent;
+	border-radius: 3px;
+	font-size: 14px;
+	line-height: 20px;
+	padding: 1px 10px 0 18px;
+	min-width: 100%;
+	background-color: var(--background-secondary-alt);
+}
+
+.textlint-results-container .result:hover,
+.textlint-results-container .result-selected:hover {
+	background-color: var(--background-primary);
+	cursor : var(--cursor);
+}
+
+.textlint-results-container .result:hover .result-primary,
+.textlint-results-container .result-selected:hover .result-primary {
+	color: var(--text-accent);
+}
+
+.textlint-results-container .result:hover .result-secondary,
+.textlint-results-container .result-selected:hover .result-secondary {
+	color: var(--text-muted);
+}

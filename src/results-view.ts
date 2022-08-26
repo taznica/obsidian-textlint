@@ -28,5 +28,17 @@ export class ResultsView extends ItemView {
 		const container = this.containerEl.children[1];
 		container.empty();
 		container.appendChild(formatAsDetail(results));
+
+		const resultElements = container.findAll(".result");
+		resultElements.forEach((result: HTMLElement) => {
+			result.addEventListener("click", (event: MouseEvent) => {
+				resultElements.forEach((_result: HTMLElement) => {
+					_result.toggleClass("result-selected", false);
+				});
+
+				const target = event.currentTarget as HTMLElement;
+				target.toggleClass("result-selected", true);
+			});
+		});
 	}
 }
