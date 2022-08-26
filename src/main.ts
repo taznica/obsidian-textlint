@@ -1,4 +1,11 @@
-import { App, FileSystemAdapter, Notice, Plugin, TFile } from "obsidian";
+import {
+	App,
+	FileSystemAdapter,
+	Notice,
+	Plugin,
+	TFile,
+	WorkspaceLeaf,
+} from "obsidian";
 import * as path from "path";
 import { TextLintEngine as devTextLintEngine } from "textlint";
 import { ResultsView, VIEW_TYPE_RESULTS } from "./results-view";
@@ -51,7 +58,7 @@ export default class TextlintPlugin extends Plugin {
 
 		this.registerView(
 			VIEW_TYPE_RESULTS,
-			(leaf) => (this.resultsView = new ResultsView(leaf))
+			(leaf: WorkspaceLeaf) => (this.resultsView = new ResultsView(leaf))
 		);
 	};
 
@@ -124,7 +131,7 @@ export default class TextlintPlugin extends Plugin {
 		this.activateResultsView().then(() => {
 			this.app.workspace
 				.getLeavesOfType(VIEW_TYPE_RESULTS)
-				.forEach((leaf) => {
+				.forEach((leaf: WorkspaceLeaf) => {
 					if (leaf.view instanceof ResultsView) {
 						this.resultsView.updateView(results);
 					}
